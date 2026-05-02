@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eclipse GR2 Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060c1a;
+    --bg2: #0a1628;
+    --bg3: #0f1e35;
+    --card: #0d1a2e;
+    --card2: #112040;
+    --border: #1a3a6a;
+    --accent: #2a6bff;
+    --accent2: #0f4de0;
+    --glow: #3a7fff;
+    --text: #c8ddf8;
+    --text2: #7aa3d4;
+    --white: #e8f2ff;
+    --dim: #3a5c8a;
+    --success: #1adf8a;
+    --warn: #f0a030;
+    --red: #e04060;
+    --nav-h: 64px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% -10%, rgba(30,80,200,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 110%, rgba(10,50,150,0.14) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: rgba(6,12,26,0.92);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(18px);
+    z-index: 1000;
+    display: flex; align-items: center;
+    padding: 0 28px;
+    gap: 0;
+  }
+
+  .nav-logo {
+    font-weight: 900; font-size: 1.3rem; letter-spacing: 2px;
+    color: var(--white); text-transform: uppercase;
+    margin-right: 36px; white-space: nowrap;
+    position: relative;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-logo::after {
+    content: '';
+    position: absolute; bottom: -2px; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 6px; flex: 1;
+  }
+
+  .nav-link {
+    padding: 7px 16px; border-radius: 6px;
+    font-size: 0.85rem; font-weight: 600; letter-spacing: 0.5px;
+    color: var(--text2); cursor: pointer;
+    transition: all 0.18s; text-transform: uppercase;
+    border: none; background: none;
+  }
+  .nav-link:hover, .nav-link.active {
+    color: var(--white); background: rgba(42,107,255,0.15);
+  }
+  .nav-link.active { color: var(--accent); }
+
+  /* Search */
+  .nav-search {
+    position: relative; margin-left: auto;
+  }
+  .nav-search input {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px 8px 38px;
+    color: var(--white); font-family: inherit; font-size: 0.85rem;
+    width: 220px; transition: all 0.2s; outline: none;
+  }
+  .nav-search input:focus {
+    border-color: var(--accent); width: 270px;
+    box-shadow: 0 0 0 3px rgba(42,107,255,0.12);
+  }
+  .nav-search input::placeholder { color: var(--dim); }
+  .nav-search-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--dim); font-size: 0.85rem; pointer-events: none;
+  }
+
+  /* Nav right */
+  .nav-right {
+    display: flex; align-items: center; gap: 10px; margin-left: 20px;
+  }
+  .btn {
+    padding: 8px 18px; border-radius: 7px;
+    font-family: inherit; font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; border: none; transition: all 0.18s;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--white); border-color: var(--accent); background: rgba(42,107,255,0.1); }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 0 16px rgba(42,107,255,0.3);
+  }
+  .btn-primary:hover { background: #3d7fff; box-shadow: 0 0 24px rgba(42,107,255,0.5); }
+
+  /* ── PAGES ── */
+  .page { display: none; padding-top: calc(var(--nav-h) + 32px); min-height: 100vh; position: relative; z-index: 1; }
+  .page.active { display: block; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center; padding: 60px 20px 50px;
+    max-width: 700px; margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(42,107,255,0.12);
+    border: 1px solid rgba(42,107,255,0.4);
+    color: var(--accent); padding: 5px 16px;
+    border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900; color: var(--white); line-height: 1.1;
+    margin-bottom: 16px; letter-spacing: -0.5px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    color: var(--text2); font-size: 1rem; line-height: 1.7; max-width: 500px; margin: 0 auto;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .content { max-width: 980px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* Sections / Dropdowns */
+  .section { margin-bottom: 18px; }
+
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .section-header:hover {
+    border-color: var(--accent);
+    background: var(--card2);
+    box-shadow: 0 0 20px rgba(42,107,255,0.1);
+  }
+  .section-header.open {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-color: var(--accent);
+    border-bottom-color: transparent;
+  }
+
+  .section-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: rgba(42,107,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .section-title {
+    flex: 1;
+  }
+  .section-title h2 {
+    font-size: 1rem; font-weight: 700; color: var(--white); letter-spacing: 0.5px;
+  }
+  .section-title p {
+    font-size: 0.78rem; color: var(--text2); margin-top: 2px;
+  }
+
+  .section-count {
+    font-size: 0.78rem; color: var(--dim);
+    background: var(--bg3); padding: 3px 10px; border-radius: 20px;
+    border: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .section-chevron {
+    color: var(--dim); font-size: 0.85rem; transition: transform 0.25s;
+  }
+  .section-header.open .section-chevron { transform: rotate(180deg); }
+
+  .section-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-top: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+  .section-body.open { max-height: 2000px; }
+
+  .section-inner { padding: 20px; }
+
+  /* Level cards */
+  .levels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .level-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .level-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(42,107,255,0.15);
+  }
+  .level-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .level-card:hover::before { opacity: 1; }
+
+  .level-name {
+    font-size: 0.95rem; font-weight: 700; color: var(--white); margin-bottom: 4px;
+  }
+  .level-creator {
+    font-size: 0.78rem; color: var(--text2); margin-bottom: 10px;
+  }
+  .level-creator span { color: var(--accent); }
+
+  .level-meta {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .badge {
+    font-size: 0.7rem; font-family: 'Share Tech Mono', monospace;
+    padding: 2px 8px; border-radius: 4px; border: 1px solid;
+  }
+  .badge-diff { color: var(--warn); border-color: rgba(240,160,48,0.4); background: rgba(240,160,48,0.08); }
+  .badge-id { color: var(--text2); border-color: var(--border); background: var(--bg); }
+  .badge-new { color: var(--success); border-color: rgba(26,223,138,0.4); background: rgba(26,223,138,0.08); }
+
+  .btn-download {
+    width: 100%;
+    background: rgba(42,107,255,0.15);
+    border: 1px solid rgba(42,107,255,0.4);
+    color: var(--accent);
+    padding: 8px; border-radius: 7px;
+    font-family: inherit; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; transition: all 0.18s;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .btn-download:hover {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 0 16px rgba(42,107,255,0.4);
+  }
+
+  /* Coming soon overlay */
+  .coming-soon {
+    padding: 48px 20px; text-align: center;
+  }
+  .coming-soon-icon { font-size: 2.5rem; margin-bottom: 14px; }
+  .coming-soon h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .coming-soon p { font-size: 0.85rem; color: var(--text2); }
+
+  /* Requests list */
+  .requests-list { display: flex; flex-direction: column; gap: 10px; }
+  .request-item {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .request-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; color: var(--dim);
+    background: var(--bg); padding: 3px 8px;
+    border-radius: 4px; border: 1px solid var(--border);
+    min-width: 48px; text-align: center;
+  }
+  .request-info { flex: 1; }
+  .request-name { font-size: 0.9rem; font-weight: 600; color: var(--white); }
+  .request-by { font-size: 0.75rem; color: var(--text2); margin-top: 2px; }
+  .request-status {
+    font-size: 0.7rem; font-family: 'Share Tech Mono', monospace;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .status-pending { color: var(--warn); background: rgba(240,160,48,0.1); border: 1px solid rgba(240,160,48,0.3); }
+  .status-approved { color: var(--success); background: rgba(26,223,138,0.1); border: 1px solid rgba(26,223,138,0.3); }
+
+  /* ── MODAL / Auth ── */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(6,12,26,0.85); backdrop-filter: blur(6px);
+    z-index: 2000; align-items: center; justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    width: 100%; max-width: 420px;
+    position: relative;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(42,107,255,0.1);
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.94) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; color: var(--dim);
+    font-size: 1.2rem; cursor: pointer; line-height: 1;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--white); }
+
+  .modal h2 {
+    font-size: 1.3rem; font-weight: 800; color: var(--white);
+    margin-bottom: 6px; letter-spacing: 0.5px;
+  }
+  .modal p { font-size: 0.82rem; color: var(--text2); margin-bottom: 24px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block; font-size: 0.75rem; font-weight: 700;
+    color: var(--text2); margin-bottom: 7px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .form-group input, .form-group textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--white); font-family: inherit; font-size: 0.9rem;
+    outline: none; transition: all 0.18s;
+    resize: none;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(42,107,255,0.12);
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: var(--dim); }
+
+  .form-error {
+    font-size: 0.75rem; color: var(--red); margin-top: 6px;
+    display: none;
+  }
+  .form-error.show { display: block; }
+
+  .modal .btn-primary { width: 100%; padding: 12px; font-size: 0.9rem; margin-top: 4px; }
+
+  .modal-switch {
+    text-align: center; margin-top: 18px;
+    font-size: 0.8rem; color: var(--text2);
+  }
+  .modal-switch a {
+    color: var(--accent); cursor: pointer; font-weight: 600;
+    text-decoration: none;
+  }
+  .modal-switch a:hover { text-decoration: underline; }
+
+  /* ── REQUEST PAGE ── */
+  .request-page { max-width: 600px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .req-hero {
+    text-align: center; padding: 40px 20px 40px; margin-bottom: 0;
+  }
+  .req-hero h1 {
+    font-size: 2rem; font-weight: 900; color: var(--white);
+    margin-bottom: 8px;
+  }
+  .req-hero p { font-size: 0.9rem; color: var(--text2); }
+
+  .req-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+  }
+  .req-card h3 {
+    font-size: 1rem; font-weight: 700; color: var(--white);
+    margin-bottom: 20px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .req-login-wall {
+    text-align: center; padding: 48px 24px;
+  }
+  .req-login-wall .icon { font-size: 2.5rem; margin-bottom: 16px; }
+  .req-login-wall h3 { font-size: 1.1rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .req-login-wall p { font-size: 0.85rem; color: var(--text2); margin-bottom: 20px; }
+  .req-login-wall .btn { display: inline-block; }
+
+  .success-msg {
+    display: none;
+    background: rgba(26,223,138,0.08);
+    border: 1px solid rgba(26,223,138,0.3);
+    color: var(--success);
+    padding: 14px 18px; border-radius: 8px;
+    font-size: 0.88rem; text-align: center;
+    margin-bottom: 16px;
+  }
+  .success-msg.show { display: block; }
+
+  /* Divider */
+  .divider {
+    height: 1px; background: var(--border); margin: 32px 0;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--card2); border: 1px solid var(--border);
+    color: var(--white); padding: 14px 20px; border-radius: 10px;
+    font-size: 0.85rem; z-index: 9999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 300px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.toast-success { border-color: rgba(26,223,138,0.4); color: var(--success); }
+  .toast.toast-error { border-color: rgba(224,64,96,0.4); color: var(--red); }
+
+  /* User chip */
+  .user-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .user-chip:hover { border-color: var(--accent); }
+  .user-chip-name { font-size: 0.82rem; font-weight: 600; color: var(--white); }
+  .user-chip-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent); display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #fff;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    nav { padding: 0 14px; gap: 8px; }
+    .nav-search input { width: 140px; }
+    .nav-search input:focus { width: 170px; }
+    .nav-links .nav-link { padding: 6px 10px; font-size: 0.75rem; }
+    .levels-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Eclipse <span>GR2</span></div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home')">Levels</button>
+    <button class="nav-link" onclick="showPage('request')">Request</button>
+  </div>
+  <div class="nav-search">
+    <span class="nav-search-icon">🔍</span>
+    <input type="text" placeholder="Search levels..." id="searchInput" oninput="handleSearch()" />
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="btn btn-ghost" onclick="openModal('login')">Log In</button>
+    <button class="btn btn-primary" onclick="openModal('signup')">Sign Up</button>
+  </div>
+</nav>
+
+<!-- ══════════════════ HOME PAGE ══════════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-badge">✦ Megahack Eclipse</div>
+    <h1>GR2 <span>File</span> Hub</h1>
+    <p>Download community-made GR2 files for Megahack Eclipse. Browse main levels, map packs and community requests below.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- MAIN LEVELS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)" id="sec-main">
+        <div class="section-icon">🎮</div>
+        <div class="section-title">
+          <h2>Main Levels</h2>
+          <p>Official & featured GR2 files</p>
+        </div>
+        <span class="section-count" id="main-count">0 levels</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="levels-grid" id="main-levels-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP PACKS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">📦</div>
+        <div class="section-title">
+          <h2>Map Packs</h2>
+          <p>Themed GR2 collections</p>
+        </div>
+        <span class="section-count" id="mappacks-count">Coming Soon</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="levels-grid" id="mappacks-grid">
+            <div style="grid-column:1/-1">
+              <div class="coming-soon">
+                <div class="coming-soon-icon">🚧</div>
+                <h3>Coming Soon</h3>
+                <p>Map packs are currently in development. Check back later!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAUNTLETS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">⚔️</div>
+        <div class="section-title">
+          <h2>Gauntlets</h2>
+          <p>Gauntlet-tier GR2 files</p>
+        </div>
+        <span class="section-count" id="gauntlets-count">Coming Soon</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="levels-grid" id="gauntlets-grid">
+            <div style="grid-column:1/-1">
+              <div class="coming-soon">
+                <div class="coming-soon-icon">🚧</div>
+                <h3>Coming Soon</h3>
+                <p>Gauntlet files are on the way!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /home page -->
+
+
+<!-- ══════════════════ REQUEST PAGE ══════════════════ -->
+<div class="page" id="page-request">
+  <div class="hero" style="padding-top:40px;padding-bottom:30px">
+    <div class="hero-badge">📋 Community</div>
+    <h1>Level <span>Requests</span></h1>
+    <p>Submit a GR2 request or browse pending and accepted requests below.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- SUBMIT FORM -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">📤</div>
+        <div class="section-title">
+          <h2>Submit a Request</h2>
+          <p>Ask for a level to be added</p>
+        </div>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner" style="max-width:560px;margin:0 auto">
+          <!-- login wall -->
+          <div class="req-login-wall" id="req-login-wall">
+            <div class="icon">🔒</div>
+            <h3>Login Required</h3>
+            <p>You need to be logged in to submit a level request.</p>
+            <button class="btn btn-primary" onclick="openModal('login')">Log In</button>
+            &nbsp;
+            <button class="btn btn-ghost" onclick="openModal('signup')">Sign Up</button>
+          </div>
+          <!-- form -->
+          <div id="req-form-wrap" style="display:none">
+            <div class="success-msg" id="req-success">✅ Request submitted! We'll review it soon.</div>
+            <div class="form-group">
+              <label>Level ID *</label>
+              <input type="text" id="req-id" placeholder="e.g. 128" />
+              <div class="form-error" id="err-id">Please enter a valid level ID</div>
+            </div>
+            <div class="form-group">
+              <label>Level Name *</label>
+              <input type="text" id="req-name" placeholder="e.g. Stereo Madness" />
+              <div class="form-error" id="err-name">Please enter the level name</div>
+            </div>
+            <div class="form-group">
+              <label>Creator *</label>
+              <input type="text" id="req-creator" placeholder="e.g. RobTop" />
+              <div class="form-error" id="err-creator">Please enter the creator name</div>
+            </div>
+            <button class="btn btn-primary" onclick="submitRequest()" style="width:100%;padding:12px;margin-top:6px">📤 Submit Request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PENDING REQUESTS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">⏳</div>
+        <div class="section-title">
+          <h2>Pending Requests</h2>
+          <p>Waiting to be reviewed</p>
+        </div>
+        <span class="section-count" id="req-count">0 requests</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="requests-list" id="requests-list">
+            <p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:24px 0">No pending requests yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCEPTED REQUESTS -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">✅</div>
+        <div class="section-title">
+          <h2>Accepted Requests</h2>
+          <p>Approved and added to the hub</p>
+        </div>
+        <span class="section-count" id="accepted-count">0 accepted</span>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="requests-list" id="accepted-list">
+            <p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:24px 0">No accepted requests yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+
+<!-- LOGIN -->
+<div class="modal-backdrop" id="modal-login">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login')">✕</button>
+    <h2>Welcome Back</h2>
+    <p>Log in to your Eclipse GR2 account</p>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-username" placeholder="Your username" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Your password" />
+    </div>
+    <div class="form-error" id="login-error" style="margin-bottom:10px">Invalid username or password</div>
+    <button class="btn btn-primary" onclick="doLogin()">Log In</button>
+    <div class="modal-switch">Don't have an account? <a onclick="switchModal('login','signup')">Sign Up</a></div>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div class="modal-backdrop" id="modal-signup">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('signup')">✕</button>
+    <h2>Create Account</h2>
+    <p>Join the Eclipse GR2 community</p>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="signup-username" placeholder="Choose a username" />
+      <div class="form-error" id="su-err-user">Username already taken or invalid</div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="signup-password" placeholder="Choose a password (min 6 chars)" />
+      <div class="form-error" id="su-err-pass">Password must be at least 6 characters</div>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input type="password" id="signup-confirm" placeholder="Repeat your password" />
+      <div class="form-error" id="su-err-conf">Passwords do not match</div>
+    </div>
+    <button class="btn btn-primary" onclick="doSignup()">Create Account</button>
+    <div class="modal-switch">Already have an account? <a onclick="switchModal('signup','login')">Log In</a></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA (loaded from uploader via localStorage) ──────────────────────────
+const UPLOADER_KEY = 'eclipse_gr2_files';
+
+function loadUploadedLevels() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(UPLOADER_KEY) || '[]');
+    return raw.map(f => ({
+      id: f.id,
+      name: f.name,
+      creator: f.creator,
+      diff: f.diff || 'Unknown',
+      gr2: f.b64 || null,
+      section: f.section || 'main',
+      badge: isRecent(f.uploadedAt) ? 'new' : null
+    }));
+  } catch { return []; }
+}
+
+function isRecent(ts) {
+  return ts && (Date.now() - ts) < 7 * 24 * 60 * 60 * 1000; // within 7 days
+}
+
+let LEVELS = loadUploadedLevels();
+
+const WEBHOOK = "https://discord.com/api/webhooks/1500084858247184426/usQP8zjs95a2MDQEAxLsxa3C-QxToZMkB4FCTitKGg0H2OdC0ggi5JktrHlnEuPgawpk";
+
+// ── AUTH (localStorage) ──────────────────────────────────────────────────
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('gr2_users') || '{}'); } catch { return {}; }
+}
+function saveUsers(u) { localStorage.setItem('gr2_users', JSON.stringify(u)); }
+function getSession() {
+  try { return JSON.parse(localStorage.getItem('gr2_session') || 'null'); } catch { return null; }
+}
+function saveSession(u) { localStorage.setItem('gr2_session', JSON.stringify(u)); }
+function clearSession() { localStorage.removeItem('gr2_session'); }
+
+function getCurrentUser() { return getSession(); }
+
+// ── REQUESTS (localStorage) ──────────────────────────────────────────────
+function getRequests() {
+  try { return JSON.parse(localStorage.getItem('gr2_requests') || '[]'); } catch { return []; }
+}
+function saveRequests(r) { localStorage.setItem('gr2_requests', JSON.stringify(r)); }
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  LEVELS = loadUploadedLevels();
+  renderLevels(LEVELS);
+  renderRequests();
+  updateNav();
+  const first = document.querySelector('#page-home .section-header');
+  if (first) toggleSection(first);
+});
+
+// ── PAGES ─────────────────────────────────────────────────────────────────
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
+  const map = { home: 0, request: 1 };
+  const links = document.querySelectorAll('.nav-link');
+  if (links[map[p]]) links[map[p]].classList.add('active');
+  if (p === 'request') { updateRequestPage(); renderRequests(); }
+  window.scrollTo(0, 0);
+}
+
+// ── SECTIONS ──────────────────────────────────────────────────────────────
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const isOpen = header.classList.contains('open');
+  header.classList.toggle('open', !isOpen);
+  body.classList.toggle('open', !isOpen);
+}
+
+// ── LEVELS ────────────────────────────────────────────────────────────────
+function renderLevels(data) {
+  const grid = document.getElementById('main-levels-grid');
+  const count = document.getElementById('main-count');
+  count.textContent = data.length + ' level' + (data.length !== 1 ? 's' : '');
+
+  if (!data.length) {
+    grid.innerHTML = q
+      ? '<p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:20px 0;grid-column:1/-1">No levels match your search.</p>'
+      : '<p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:28px 0;grid-column:1/-1">No levels uploaded yet. Use the <strong style="color:var(--accent)">Admin Uploader</strong> to add GR2 files.</p>';
+    return;
+  }
+
+  grid.innerHTML = data.map(l => `
+    <div class="level-card">
+      <div class="level-name">${l.name}</div>
+      <div class="level-creator">by <span>${l.creator}</span></div>
+      <div class="level-meta">
+        <span class="badge badge-id">#${l.id}</span>
+        <span class="badge badge-diff">${l.diff}</span>
+        ${l.badge === 'new' ? '<span class="badge badge-new">NEW</span>' : ''}
+      </div>
+      <button class="btn-download" onclick="downloadLevel(${l.id}, '${l.name}')">⬇ Download GR2</button>
+    </div>
+  `).join('');
+}
+
+function downloadLevel(id, name) {
+  const level = LEVELS.find(l => l.id === id);
+  if (level && level.gr2 && level.gr2.startsWith('data:')) {
+    const a = document.createElement('a');
+    a.href = level.gr2;
+    a.download = name.replace(/\s+/g, '_') + '.gr2';
+    a.click();
+    showToast('⬇ Downloading ' + name + '...', 'success');
+  } else {
+    showToast('⚠ No file attached yet for ' + name, '');
+  }
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────
+function handleSearch() {
+  LEVELS = loadUploadedLevels();
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (!q) { renderLevels(LEVELS); return; }
+  const filtered = LEVELS.filter(l =>
+    l.name.toLowerCase().includes(q) ||
+    l.creator.toLowerCase().includes(q) ||
+    String(l.id).includes(q)
+  );
+  renderLevels(filtered);
+  const header = document.querySelector('#sec-main');
+  if (header && !header.classList.contains('open')) toggleSection(header);
+}
+
+// ── REQUESTS ──────────────────────────────────────────────────────────────
+function renderRequests() {
+  const reqs = getRequests();
+  const pending  = reqs.filter(r => r.status !== 'accepted');
+  const accepted = reqs.filter(r => r.status === 'accepted');
+
+  // Pending
+  const list = document.getElementById('requests-list');
+  const count = document.getElementById('req-count');
+  if (count) count.textContent = pending.length + ' request' + (pending.length !== 1 ? 's' : '');
+  if (list) {
+    list.innerHTML = pending.length ? pending.map(r => `
+      <div class="request-item">
+        <span class="request-num">#${r.levelId}</span>
+        <div class="request-info">
+          <div class="request-name">${r.name}</div>
+          <div class="request-by">by ${r.creator} — requested by <strong style="color:var(--text)">${r.user}</strong></div>
+        </div>
+        <span class="request-status status-pending">PENDING</span>
+      </div>
+    `).join('') : '<p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:24px 0">No pending requests yet.</p>';
+  }
+
+  // Accepted
+  const alist = document.getElementById('accepted-list');
+  const acount = document.getElementById('accepted-count');
+  if (acount) acount.textContent = accepted.length + ' accepted';
+  if (alist) {
+    alist.innerHTML = accepted.length ? accepted.map(r => `
+      <div class="request-item">
+        <span class="request-num">#${r.levelId}</span>
+        <div class="request-info">
+          <div class="request-name">${r.name}</div>
+          <div class="request-by">by ${r.creator} — requested by <strong style="color:var(--text)">${r.user}</strong></div>
+        </div>
+        <span class="request-status status-approved">ACCEPTED</span>
+      </div>
+    `).join('') : '<p style="color:var(--text2);font-size:0.85rem;text-align:center;padding:24px 0">No accepted requests yet.</p>';
+  }
+}
+
+// ── REQUEST PAGE ──────────────────────────────────────────────────────────
+function updateRequestPage() {
+  const user = getCurrentUser();
+  document.getElementById('req-login-wall').style.display = user ? 'none' : 'block';
+  document.getElementById('req-form-wrap').style.display = user ? 'block' : 'none';
+  // Auto-open the submit section
+  const submitHeader = document.querySelector('#page-request .section-header');
+  if (submitHeader && !submitHeader.classList.contains('open')) toggleSection(submitHeader);
+}
+
+async function submitRequest() {
+  const id = document.getElementById('req-id').value.trim();
+  const name = document.getElementById('req-name').value.trim();
+  const creator = document.getElementById('req-creator').value.trim();
+
+  let ok = true;
+  if (!id || isNaN(id)) { showErr('err-id', true); ok = false; } else { showErr('err-id', false); }
+  if (!name) { showErr('err-name', true); ok = false; } else { showErr('err-name', false); }
+  if (!creator) { showErr('err-creator', true); ok = false; } else { showErr('err-creator', false); }
+  if (!ok) return;
+
+  const user = getCurrentUser();
+
+  // Save locally
+  const reqs = getRequests();
+  reqs.push({ levelId: id, name, creator, user: user.username, ts: Date.now() });
+  saveRequests(reqs);
+  renderRequests();
+
+  // Discord webhook
+  const embed = {
+    username: "Eclipse GR2 Hub",
+    embeds: [{
+      title: "📋 New Level Request",
+      color: 0x2a6bff,
+      fields: [
+        { name: "Level ID", value: id, inline: true },
+        { name: "Level Name", value: name, inline: true },
+        { name: "Creator", value: creator, inline: true },
+        { name: "Requested by", value: user.username, inline: true },
+      ],
+      timestamp: new Date().toISOString(),
+      footer: { text: "Eclipse GR2 Hub" }
+    }]
+  };
+
+  try {
+    await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(embed)
+    });
+  } catch(e) { /* silently fail if CORS blocks */ }
+
+  // Reset
+  document.getElementById('req-id').value = '';
+  document.getElementById('req-name').value = '';
+  document.getElementById('req-creator').value = '';
+  const s = document.getElementById('req-success');
+  s.classList.add('show');
+  setTimeout(() => s.classList.remove('show'), 4000);
+  showToast('✅ Request submitted!', 'success');
+}
+
+function showErr(id, show) {
+  document.getElementById(id).classList.toggle('show', show);
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const users = getUsers();
+  const err = document.getElementById('login-error');
+
+  if (!username || !password || !users[username] || users[username] !== btoa(password)) {
+    err.classList.add('show'); return;
+  }
+  err.classList.remove('show');
+  saveSession({ username });
+  closeModal('login');
+  updateNav();
+  updateRequestPage();
+  showToast('👋 Welcome back, ' + username + '!', 'success');
+}
+
+function doSignup() {
+  const username = document.getElementById('signup-username').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const confirm = document.getElementById('signup-confirm').value;
+  const users = getUsers();
+
+  let ok = true;
+  if (!username || username.length < 3 || users[username]) { showErr('su-err-user', true); ok = false; } else { showErr('su-err-user', false); }
+  if (!password || password.length < 6) { showErr('su-err-pass', true); ok = false; } else { showErr('su-err-pass', false); }
+  if (password !== confirm) { showErr('su-err-conf', true); ok = false; } else { showErr('su-err-conf', false); }
+  if (!ok) return;
+
+  users[username] = btoa(password);
+  saveUsers(users);
+  saveSession({ username });
+  closeModal('signup');
+  updateNav();
+  updateRequestPage();
+  showToast('🎉 Account created! Welcome, ' + username + '!', 'success');
+}
+
+function doLogout() {
+  clearSession();
+  updateNav();
+  updateRequestPage();
+  showToast('👋 Logged out', '');
+}
+
+function updateNav() {
+  const user = getCurrentUser();
+  const navRight = document.getElementById('navRight');
+  if (user) {
+    navRight.innerHTML = `
+      <div class="user-chip" onclick="doLogout()" title="Click to log out">
+        <div class="user-chip-avatar">${user.username[0].toUpperCase()}</div>
+        <span class="user-chip-name">${user.username}</span>
+        <span style="color:var(--dim);font-size:0.75rem">✕</span>
+      </div>
+    `;
+  } else {
+    navRight.innerHTML = `
+      <button class="btn btn-ghost" onclick="openModal('login')">Log In</button>
+      <button class="btn btn-primary" onclick="openModal('signup')">Sign Up</button>
+    `;
+  }
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────
+function openModal(name) {
+  document.getElementById('modal-' + name).classList.add('open');
+}
+function closeModal(name) {
+  document.getElementById('modal-' + name).classList.remove('open');
+  document.getElementById('login-error')?.classList.remove('show');
+}
+function switchModal(from, to) {
+  closeModal(from);
+  setTimeout(() => openModal(to), 120);
+}
+
+// Close on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// Enter key
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('signup-confirm').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' toast-' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
