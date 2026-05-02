@@ -7,966 +7,825 @@
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #060c1a;
-    --bg2: #0a1628;
-    --bg3: #0f1e35;
-    --card: #0d1a2e;
-    --card2: #112040;
-    --border: #1a3a6a;
-    --accent: #2a6bff;
-    --glow: #3a7fff;
-    --text: #c8ddf8;
-    --text2: #7aa3d4;
-    --white: #e8f2ff;
-    --dim: #3a5c8a;
+    --bg:      #060c1a;
+    --bg2:     #0a1628;
+    --bg3:     #0f1e35;
+    --card:    #0d1a2e;
+    --card2:   #112040;
+    --border:  #1a3a6a;
+    --accent:  #2a6bff;
+    --text:    #c8ddf8;
+    --text2:   #7aa3d4;
+    --white:   #e8f2ff;
+    --dim:     #3a5c8a;
     --success: #1adf8a;
-    --warn: #f0a030;
-    --red: #e04060;
-    --mono: 'Share Tech Mono', monospace;
+    --warn:    #f0a030;
+    --red:     #e04060;
+    --mono:    'Share Tech Mono', monospace;
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
+  * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Exo 2', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background:var(--bg); color:var(--text);
+    font-family:'Exo 2',sans-serif; min-height:100vh; overflow-x:hidden;
   }
-
   body::before {
-    content: '';
-    position: fixed; inset: 0;
+    content:''; position:fixed; inset:0;
     background:
-      radial-gradient(ellipse 70% 50% at 15% 0%, rgba(30,80,200,0.2) 0%, transparent 55%),
+      radial-gradient(ellipse 70% 50% at 15% 0%,  rgba(30,80,200,0.2)  0%, transparent 55%),
       radial-gradient(ellipse 50% 60% at 85% 100%, rgba(10,50,150,0.15) 0%, transparent 55%);
-    pointer-events: none; z-index: 0;
+    pointer-events:none; z-index:0;
   }
 
-  .wrap {
-    position: relative; z-index: 1;
-    max-width: 860px; margin: 0 auto;
-    padding: 40px 24px 80px;
+  /* LOCK */
+  #lockScreen {
+    position:fixed; inset:0; z-index:9000;
+    background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
   }
+  .lock-box {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:44px 40px;
+    width:100%; max-width:380px; text-align:center;
+    box-shadow:0 32px 80px rgba(0,0,0,0.5);
+  }
+  .lock-icon { font-size:2.4rem; margin-bottom:16px; }
+  .lock-box h1 { font-size:1.4rem; font-weight:900; color:var(--white); margin-bottom:6px; }
+  .lock-box p  { font-size:0.82rem; color:var(--text2); margin-bottom:28px; }
+  #lockInput {
+    width:100%; background:var(--bg3); border:1px solid var(--border);
+    border-radius:8px; padding:12px 14px; color:var(--white);
+    font-family:var(--mono); font-size:1rem; outline:none;
+    text-align:center; letter-spacing:3px; margin-bottom:10px;
+    transition:border-color 0.18s; display:block;
+  }
+  #lockInput.bad { border-color:var(--red); animation:shake 0.4s ease; }
+  @keyframes shake {
+    0%,100%{ transform:translateX(0); }
+    25%,75%{ transform:translateX(-6px); }
+    50%    { transform:translateX(6px); }
+  }
+  #lockError { font-size:0.75rem; color:var(--red); margin-bottom:12px; display:none; font-family:var(--mono); }
+  .lock-btn {
+    width:100%; padding:12px; border-radius:8px;
+    background:var(--accent); color:#fff; border:none;
+    font-family:inherit; font-size:0.9rem; font-weight:700;
+    cursor:pointer; letter-spacing:0.5px; text-transform:uppercase;
+    box-shadow:0 0 16px rgba(42,107,255,0.3); transition:all 0.18s;
+  }
+  .lock-btn:hover { background:#3d7fff; }
+
+  /* APP */
+  #mainApp { display:none; position:relative; z-index:1; }
+  .wrap { max-width:920px; margin:0 auto; padding:40px 24px 80px; }
 
   /* Header */
-  .header {
-    display: flex; align-items: center; gap: 16px; margin-bottom: 36px;
-  }
+  .header { display:flex; align-items:center; gap:16px; margin-bottom:32px; }
   .header-icon {
-    width: 48px; height: 48px; border-radius: 12px;
-    background: rgba(42,107,255,0.18);
-    border: 1px solid rgba(42,107,255,0.4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem;
+    width:48px; height:48px; border-radius:12px; flex-shrink:0;
+    background:rgba(42,107,255,0.18); border:1px solid rgba(42,107,255,0.4);
+    display:flex; align-items:center; justify-content:center; font-size:1.4rem;
   }
-  .header-text h1 {
-    font-size: 1.5rem; font-weight: 900; color: var(--white); letter-spacing: 0.5px;
-  }
-  .header-text p { font-size: 0.82rem; color: var(--text2); margin-top: 2px; }
-
+  .header-text h1 { font-size:1.4rem; font-weight:900; color:var(--white); }
+  .header-text p  { font-size:0.8rem; color:var(--text2); margin-top:2px; }
   .header-badge {
-    margin-left: auto;
-    background: rgba(240,160,48,0.1);
-    border: 1px solid rgba(240,160,48,0.35);
-    color: var(--warn); padding: 4px 14px;
-    border-radius: 20px; font-size: 0.72rem; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    font-family: var(--mono);
+    margin-left:auto; background:rgba(240,160,48,0.1);
+    border:1px solid rgba(240,160,48,0.35); color:var(--warn);
+    padding:4px 14px; border-radius:20px; font-size:0.7rem; font-weight:700;
+    letter-spacing:1.5px; text-transform:uppercase; font-family:var(--mono);
   }
 
-  /* Two col layout */
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media(max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+  /* Stats */
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; text-align:center; }
+  .stat-num   { font-size:1.6rem; font-weight:900; color:var(--white); font-family:var(--mono); line-height:1; }
+  .stat-label { font-size:0.7rem; color:var(--text2); margin-top:4px; text-transform:uppercase; letter-spacing:0.5px; }
 
-  /* Cards */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-  }
+  /* Cols */
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:640px){ .cols{ grid-template-columns:1fr; } .form-row{ grid-template-columns:1fr; } }
+
+  /* Card */
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:24px; }
   .card-title {
-    font-size: 0.8rem; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--text2);
-    margin-bottom: 18px; padding-bottom: 14px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
+    font-size:0.78rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--text2); margin-bottom:18px; padding-bottom:14px;
+    border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px;
+  }
+  .queue-badge {
+    display:none; margin-left:auto;
+    font-family:var(--mono); font-size:0.7rem;
+    background:rgba(42,107,255,0.15); color:var(--accent);
+    border:1px solid rgba(42,107,255,0.4); padding:3px 10px; border-radius:20px;
   }
 
-  /* Drop zone */
+  /* Dropzone */
   .dropzone {
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 40px 20px;
-    text-align: center;
-    transition: all 0.2s;
-    cursor: pointer;
-    position: relative;
-    background: var(--bg3);
+    border:2px dashed var(--border); border-radius:12px;
+    padding:36px 20px; text-align:center; transition:all 0.2s;
+    cursor:pointer; position:relative; background:var(--bg3);
   }
-  .dropzone:hover, .dropzone.dragover {
-    border-color: var(--accent);
-    background: rgba(42,107,255,0.06);
-    box-shadow: 0 0 24px rgba(42,107,255,0.12);
+  .dropzone:hover, .dropzone.over {
+    border-color:var(--accent); background:rgba(42,107,255,0.06);
+    box-shadow:0 0 24px rgba(42,107,255,0.12);
   }
-  .dropzone.dragover { transform: scale(1.02); }
-  .dropzone input[type=file] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  }
-  .dropzone-icon { font-size: 2.2rem; margin-bottom: 12px; }
-  .dropzone-text { font-size: 0.9rem; font-weight: 600; color: var(--white); margin-bottom: 6px; }
-  .dropzone-sub { font-size: 0.75rem; color: var(--text2); }
-  .dropzone-sub span { color: var(--accent); font-family: var(--mono); }
+  .dropzone.over { transform:scale(1.02); }
+  .dropzone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .dz-icon { font-size:2rem; margin-bottom:10px; }
+  .dz-text { font-size:0.88rem; font-weight:600; color:var(--white); margin-bottom:4px; }
+  .dz-sub  { font-size:0.73rem; color:var(--text2); }
+  .dz-sub span { color:var(--accent); font-family:var(--mono); }
 
-  /* Dropped file preview */
+  /* File preview */
   .file-preview {
-    display: none;
-    background: var(--bg3);
-    border: 1px solid rgba(26,223,138,0.3);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-top: 14px;
-    align-items: center; gap: 12px;
+    display:none; background:var(--bg3);
+    border:1px solid rgba(26,223,138,0.3); border-radius:10px;
+    padding:12px 14px; margin-top:12px; align-items:center; gap:12px;
   }
-  .file-preview.show { display: flex; }
-  .file-preview-icon { font-size: 1.4rem; flex-shrink: 0; }
-  .file-preview-info { flex: 1; min-width: 0; }
-  .file-preview-name {
-    font-size: 0.85rem; font-weight: 700; color: var(--success);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .file-preview-size { font-size: 0.72rem; color: var(--text2); margin-top: 2px; font-family: var(--mono); }
-  .file-preview-remove {
-    background: none; border: none; color: var(--dim);
-    cursor: pointer; font-size: 1rem; padding: 4px; transition: color 0.15s;
-    flex-shrink: 0;
-  }
-  .file-preview-remove:hover { color: var(--red); }
+  .file-preview.show { display:flex; }
+  .fp-icon { font-size:1.3rem; flex-shrink:0; }
+  .fp-info { flex:1; min-width:0; }
+  .fp-name { font-size:0.84rem; font-weight:700; color:var(--success); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fp-size { font-size:0.7rem; color:var(--text2); margin-top:2px; font-family:var(--mono); }
+  .fp-remove { background:none; border:none; color:var(--dim); cursor:pointer; font-size:1rem; padding:4px; transition:color 0.15s; flex-shrink:0; }
+  .fp-remove:hover { color:var(--red); }
 
   /* Form */
-  .form-group { margin-bottom: 14px; }
-  .form-group label {
-    display: block; font-size: 0.72rem; font-weight: 700;
-    color: var(--text2); margin-bottom: 6px;
-    text-transform: uppercase; letter-spacing: 1px;
-  }
+  .form-group { margin-bottom:14px; }
+  .form-group label { display:block; font-size:0.7rem; font-weight:700; color:var(--text2); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
   .form-group input, .form-group select {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: var(--white); font-family: inherit; font-size: 0.88rem;
-    outline: none; transition: all 0.18s;
-    appearance: none;
+    width:100%; background:var(--bg3); border:1px solid var(--border);
+    border-radius:8px; padding:10px 12px; color:var(--white);
+    font-family:inherit; font-size:0.88rem; outline:none; transition:all 0.18s; appearance:none;
   }
-  .form-group input:focus, .form-group select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(42,107,255,0.12);
-  }
-  .form-group input::placeholder { color: var(--dim); }
-  .form-group select option { background: var(--bg2); }
+  .form-group input:focus, .form-group select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(42,107,255,0.12); }
+  .form-group input::placeholder { color:var(--dim); }
+  .form-group select option { background:var(--bg2); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  .btn {
-    padding: 10px 20px; border-radius: 8px;
-    font-family: inherit; font-size: 0.82rem; font-weight: 700;
-    cursor: pointer; border: none; transition: all 0.18s;
-    letter-spacing: 0.5px; text-transform: uppercase;
-  }
-  .btn-primary {
-    background: var(--accent); color: #fff; width: 100%;
-    padding: 13px; font-size: 0.9rem;
-    box-shadow: 0 0 16px rgba(42,107,255,0.3);
-  }
-  .btn-primary:hover { background: #3d7fff; box-shadow: 0 0 28px rgba(42,107,255,0.5); }
-  .btn-primary:disabled { background: var(--dim); box-shadow: none; cursor: not-allowed; opacity: 0.6; }
-  .btn-ghost {
-    background: transparent; color: var(--text2);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { color: var(--white); border-color: var(--accent); background: rgba(42,107,255,0.08); }
-  .btn-danger {
-    background: rgba(224,64,96,0.12); color: var(--red);
-    border: 1px solid rgba(224,64,96,0.3);
-    padding: 5px 12px; font-size: 0.72rem;
-  }
-  .btn-danger:hover { background: rgba(224,64,96,0.22); }
+  /* Buttons */
+  .btn { padding:10px 20px; border-radius:8px; font-family:inherit; font-size:0.82rem; font-weight:700; cursor:pointer; border:none; transition:all 0.18s; letter-spacing:0.5px; text-transform:uppercase; }
+  .btn-primary { background:var(--accent); color:#fff; width:100%; padding:12px; font-size:0.88rem; box-shadow:0 0 16px rgba(42,107,255,0.3); }
+  .btn-primary:hover:not(:disabled) { background:#3d7fff; box-shadow:0 0 28px rgba(42,107,255,0.5); }
+  .btn-primary:disabled { background:var(--dim); box-shadow:none; cursor:not-allowed; opacity:0.6; }
+  .btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); }
+  .btn-ghost:hover { color:var(--white); border-color:var(--accent); background:rgba(42,107,255,0.08); }
+  .btn-danger { background:rgba(224,64,96,0.12); color:var(--red); border:1px solid rgba(224,64,96,0.3); padding:5px 12px; font-size:0.7rem; }
+  .btn-danger:hover { background:rgba(224,64,96,0.22); }
 
   /* Progress */
-  .progress-wrap {
-    display: none; margin-top: 14px;
-  }
-  .progress-wrap.show { display: block; }
-  .progress-label {
-    display: flex; justify-content: space-between;
-    font-size: 0.72rem; color: var(--text2); margin-bottom: 6px;
-    font-family: var(--mono);
-  }
-  .progress-bar-bg {
-    background: var(--bg3); border-radius: 6px; height: 6px; overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .progress-bar {
-    height: 100%; width: 0%; border-radius: 6px;
-    background: linear-gradient(90deg, var(--accent), var(--success));
-    transition: width 0.2s;
-  }
+  .progress-wrap { display:none; margin-top:12px; }
+  .progress-wrap.show { display:block; }
+  .progress-label { display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text2); margin-bottom:6px; font-family:var(--mono); }
+  .progress-bar-bg { background:var(--bg3); border-radius:6px; height:6px; overflow:hidden; border:1px solid var(--border); }
+  .progress-bar { height:100%; width:0%; border-radius:6px; background:linear-gradient(90deg,var(--accent),var(--success)); transition:width 0.15s; }
 
-  /* Success state */
-  .upload-success {
-    display: none; text-align: center; padding: 24px 16px;
-  }
-  .upload-success.show { display: block; }
-  .upload-success-icon { font-size: 2rem; margin-bottom: 10px; }
-  .upload-success h3 { font-size: 0.95rem; font-weight: 700; color: var(--success); margin-bottom: 6px; }
-  .upload-success p { font-size: 0.78rem; color: var(--text2); }
+  /* Success */
+  .upload-success { display:none; text-align:center; padding:22px 12px; }
+  .upload-success.show { display:block; }
+  .upload-success h3 { font-size:0.95rem; font-weight:700; color:var(--success); margin-bottom:6px; }
+  .upload-success p  { font-size:0.78rem; color:var(--text2); margin-bottom:14px; }
+  .success-btns { display:flex; gap:8px; }
+  .success-btns .btn { flex:1; }
 
   /* File list */
-  .files-list { display: flex; flex-direction: column; gap: 10px; }
-  .file-entry {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 13px 14px;
-    transition: border-color 0.18s;
-  }
-  .file-entry:hover { border-color: rgba(42,107,255,0.4); }
-  .file-entry-top {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
-  }
-  .file-entry-num {
-    font-family: var(--mono); font-size: 0.7rem; color: var(--dim);
-    background: var(--bg); padding: 2px 8px; border-radius: 4px;
-    border: 1px solid var(--border); flex-shrink: 0;
-  }
-  .file-entry-name {
-    font-size: 0.88rem; font-weight: 700; color: var(--white); flex: 1;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .file-entry-meta {
-    display: flex; gap: 8px; flex-wrap: wrap;
-  }
-  .chip {
-    font-size: 0.68rem; font-family: var(--mono);
-    padding: 2px 8px; border-radius: 4px;
-    border: 1px solid var(--border); color: var(--text2);
-    background: var(--bg);
-  }
-  .chip-diff { color: var(--warn); border-color: rgba(240,160,48,0.35); background: rgba(240,160,48,0.07); }
-  .chip-size { color: var(--text2); }
-  .chip-type { color: var(--accent); border-color: rgba(42,107,255,0.3); background: rgba(42,107,255,0.07); }
-
-  .file-entry-actions {
-    display: flex; gap: 8px; margin-top: 10px; padding-top: 10px;
-    border-top: 1px solid var(--border);
-    align-items: center;
-  }
-  .file-entry-dl {
-    flex: 1; font-size: 0.75rem; padding: 6px;
-    background: rgba(42,107,255,0.1); color: var(--accent);
-    border: 1px solid rgba(42,107,255,0.3); border-radius: 6px;
-    cursor: pointer; font-family: inherit; font-weight: 700;
-    text-align: center; transition: all 0.18s;
-  }
-  .file-entry-dl:hover { background: var(--accent); color: #fff; }
+  .files-list { display:flex; flex-direction:column; gap:10px; }
+  .file-entry { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:13px 14px; transition:border-color 0.18s; }
+  .file-entry:hover { border-color:rgba(42,107,255,0.4); }
+  .fe-top { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .fe-num  { font-family:var(--mono); font-size:0.7rem; color:var(--dim); background:var(--bg); padding:2px 8px; border-radius:4px; border:1px solid var(--border); flex-shrink:0; }
+  .fe-name { font-size:0.88rem; font-weight:700; color:var(--white); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fe-meta { display:flex; gap:8px; flex-wrap:wrap; }
+  .chip      { font-size:0.67rem; font-family:var(--mono); padding:2px 8px; border-radius:4px; border:1px solid var(--border); color:var(--text2); background:var(--bg); }
+  .chip-diff { color:var(--warn);   border-color:rgba(240,160,48,0.35); background:rgba(240,160,48,0.07); }
+  .chip-type { color:var(--accent); border-color:rgba(42,107,255,0.3);  background:rgba(42,107,255,0.07); }
+  .fe-actions { display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+  .fe-dl { flex:1; font-size:0.74rem; padding:6px; background:rgba(42,107,255,0.1); color:var(--accent); border:1px solid rgba(42,107,255,0.3); border-radius:6px; cursor:pointer; font-family:inherit; font-weight:700; text-align:center; transition:all 0.18s; }
+  .fe-dl:hover { background:var(--accent); color:#fff; }
 
   /* Empty state */
-  .empty-state {
-    text-align: center; padding: 40px 20px;
-    color: var(--dim); font-size: 0.82rem;
-  }
-  .empty-state-icon { font-size: 2rem; margin-bottom: 10px; opacity: 0.5; }
+  .empty-state { text-align:center; padding:40px 20px; color:var(--dim); font-size:0.82rem; }
+  .empty-icon  { font-size:2rem; margin-bottom:10px; opacity:0.5; }
 
-  /* Stats row */
-  .stats {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-    margin-bottom: 20px;
-  }
-  .stat {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    text-align: center;
-  }
-  .stat-num {
-    font-size: 1.6rem; font-weight: 900; color: var(--white);
-    font-family: var(--mono); line-height: 1;
-  }
-  .stat-label { font-size: 0.72rem; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  /* Export row */
+  .export-row { display:flex; gap:10px; margin-top:16px; }
+  .export-row .btn { flex:1; font-size:0.74rem; }
 
-  /* Export section */
-  .export-row {
-    display: flex; gap: 10px; margin-top: 16px;
+  /* JSON preview */
+  .json-prev-box {
+    background:var(--bg3); border:1px solid rgba(26,223,138,0.3);
+    border-radius:8px; padding:12px 14px;
+    display:flex; align-items:center; gap:10px; margin-bottom:10px;
   }
-  .export-row .btn { flex: 1; font-size: 0.75rem; }
+  .jp-info { flex:1; min-width:0; }
+  .jp-name { font-size:0.84rem; font-weight:700; color:var(--success); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .jp-meta { font-size:0.7rem; color:var(--text2); margin-top:2px; font-family:var(--mono); }
+  .jp-rm   { background:none; border:none; color:var(--dim); cursor:pointer; font-size:1rem; padding:4px; transition:color 0.15s; flex-shrink:0; }
+  .jp-rm:hover { color:var(--red); }
+  .merge-row { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.77rem; color:var(--text2); margin-top:10px; }
+  .merge-row input { accent-color:var(--accent); width:14px; height:14px; }
 
   /* Toast */
   .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--card2); border: 1px solid var(--border);
-    color: var(--white); padding: 12px 18px; border-radius: 10px;
-    font-size: 0.82rem; z-index: 9999;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    transform: translateY(60px); opacity: 0;
-    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    max-width: 280px;
+    position:fixed; bottom:24px; right:24px;
+    background:var(--card2); border:1px solid var(--border);
+    color:var(--white); padding:12px 18px; border-radius:10px;
+    font-size:0.82rem; z-index:9999; box-shadow:0 8px 32px rgba(0,0,0,0.4);
+    transform:translateY(60px); opacity:0; max-width:300px;
+    transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
   }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { border-color: rgba(26,223,138,0.4); color: var(--success); }
-  .toast.error   { border-color: rgba(224,64,96,0.4); color: var(--red); }
+  .toast.show    { transform:translateY(0); opacity:1; }
+  .toast.success { border-color:rgba(26,223,138,0.4); color:var(--success); }
+  .toast.error   { border-color:rgba(224,64,96,0.4);  color:var(--red); }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* Full-width upload area on mobile */
-  @media(max-width: 640px) {
-    .form-row { grid-template-columns: 1fr; }
-    .stats { grid-template-columns: repeat(3,1fr); }
-    .stat-num { font-size: 1.2rem; }
-  }
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 </style>
 </head>
 <body>
 
-<!-- ── LOCK SCREEN ── -->
-<div id="lockScreen" style="
-  position:fixed;inset:0;z-index:9000;
-  background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-">
-  <div style="
-    background:var(--card);border:1px solid var(--border);
-    border-radius:18px;padding:44px 40px;
-    width:100%;max-width:380px;text-align:center;
-    box-shadow:0 32px 80px rgba(0,0,0,0.5);
-  ">
-    <div style="font-size:2.4rem;margin-bottom:16px">🔐</div>
-    <h1 style="font-size:1.4rem;font-weight:900;color:var(--white);margin-bottom:6px;letter-spacing:0.5px">GR2 Uploader</h1>
-    <p style="font-size:0.82rem;color:var(--text2);margin-bottom:28px">Enter the admin password to access the uploader</p>
-    <input type="password" id="lockInput" placeholder="••••••••" autocomplete="off"
-      onkeydown="if(event.key==='Enter') tryUnlock()"
-      style="
-        width:100%;background:var(--bg3);border:1px solid var(--border);
-        border-radius:8px;padding:12px 14px;color:var(--white);
-        font-family:var(--mono);font-size:1rem;outline:none;
-        text-align:center;letter-spacing:3px;margin-bottom:10px;
-        transition:border-color 0.18s;
-      " id="lockInput" />
-    <div id="lockError" style="font-size:0.75rem;color:var(--red);margin-bottom:12px;font-family:var(--mono);display:none">
-      ✕ Incorrect password
-    </div>
-    <button onclick="tryUnlock()" style="
-      width:100%;padding:12px;border-radius:8px;
-      background:var(--accent);color:#fff;border:none;
-      font-family:inherit;font-size:0.9rem;font-weight:700;
-      cursor:pointer;letter-spacing:0.5px;text-transform:uppercase;
-      box-shadow:0 0 16px rgba(42,107,255,0.3);transition:all 0.18s;
-    ">Unlock</button>
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">🔐</div>
+    <h1>GR2 Uploader</h1>
+    <p>Enter the admin password to continue</p>
+    <input type="password" id="lockInput" placeholder="••••••••" autocomplete="off" />
+    <div id="lockError">✕ Incorrect password</div>
+    <button class="lock-btn" id="lockBtn">Unlock</button>
   </div>
 </div>
 
-<!-- ── MAIN APP (hidden until unlocked) ── -->
-<div id="mainApp" style="display:none">
-<div class="wrap">
+<!-- MAIN APP -->
+<div id="mainApp">
+  <div class="wrap">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-icon">⚙️</div>
-    <div class="header-text">
-      <h1>Eclipse GR2 Uploader</h1>
-      <p>Admin tool — drag & drop GR2 files to publish them to the hub</p>
-    </div>
-    <div class="header-badge">Admin Tool</div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-num" id="stat-total">0</div>
-      <div class="stat-label">Total Files</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="stat-size">0 B</div>
-      <div class="stat-label">Total Size</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num" id="stat-today">0</div>
-      <div class="stat-label">Added Today</div>
-    </div>
-  </div>
-
-  <!-- Main cols -->
-  <div class="cols">
-
-    <!-- LEFT: Upload -->
-    <div style="display:flex;flex-direction:column;gap:16px">
-
-      <!-- Drop zone card -->
-      <div class="card">
-        <div class="card-title">⬆ Upload GR2 File</div>
-
-        <div class="dropzone" id="dropzone">
-          <input type="file" id="fileInput" accept=".gr2,.gdr,*" multiple />
-          <div class="dropzone-icon">📂</div>
-          <div class="dropzone-text">Drag & drop GR2 files here</div>
-          <div class="dropzone-sub">or click to browse — <span>.gr2 / .gdr</span> files accepted</div>
-        </div>
-
-        <div class="file-preview" id="filePreview">
-          <div class="file-preview-icon">📄</div>
-          <div class="file-preview-info">
-            <div class="file-preview-name" id="previewName">—</div>
-            <div class="file-preview-size" id="previewSize">—</div>
-          </div>
-          <button class="file-preview-remove" onclick="clearFile()" title="Remove">✕</button>
-        </div>
-
-        <div class="progress-wrap" id="progressWrap">
-          <div class="progress-label">
-            <span id="progressLabel">Processing...</span>
-            <span id="progressPct">0%</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar" id="progressBar"></div>
-          </div>
-        </div>
-
-        <div class="upload-success" id="uploadSuccess">
-          <div class="upload-success-icon">✅</div>
-          <h3>File published!</h3>
-          <p id="uploadSuccessMsg">The GR2 file is now live on the hub.</p>
-          <button class="btn btn-ghost" onclick="resetForm()" style="margin-top:12px;width:100%">Upload Another</button>
-        </div>
+    <div class="header">
+      <div class="header-icon">⚙️</div>
+      <div class="header-text">
+        <h1>Eclipse GR2 Uploader</h1>
+        <p>Admin tool — drag &amp; drop GR2 files to publish them to the hub</p>
       </div>
+      <div class="header-badge">Admin Tool</div>
+    </div>
 
-      <!-- Metadata card -->
-      <div class="card" id="metaCard">
-        <div class="card-title">🏷 Level Metadata</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Files</div></div>
+      <div class="stat"><div class="stat-num" id="statSize">0 B</div><div class="stat-label">Total Size</div></div>
+      <div class="stat"><div class="stat-num" id="statToday">0</div><div class="stat-label">Added Today</div></div>
+    </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Level ID *</label>
-            <input type="number" id="meta-id" placeholder="128" min="1" />
+    <div class="cols">
+
+      <!-- LEFT -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- GR2 drop zone -->
+        <div class="card">
+          <div class="card-title">
+            ⬆ Upload GR2 Files
+            <span class="queue-badge" id="queueBadge"></span>
+          </div>
+
+          <div class="dropzone" id="gr2Zone">
+            <input type="file" id="gr2Input" accept=".gr2,.gdr,*" multiple />
+            <div class="dz-icon">📂</div>
+            <div class="dz-text">Drag &amp; drop GR2 files here</div>
+            <div class="dz-sub">Drop multiple — filled in <span>one by one</span></div>
+          </div>
+
+          <div class="file-preview" id="filePreview">
+            <div class="fp-icon">📄</div>
+            <div class="fp-info">
+              <div class="fp-name" id="previewName">—</div>
+              <div class="fp-size" id="previewSize">—</div>
+            </div>
+            <button class="fp-remove" id="clearFileBtn">✕</button>
+          </div>
+
+          <div class="progress-wrap" id="progressWrap">
+            <div class="progress-label">
+              <span id="progressLabel">Processing...</span>
+              <span id="progressPct">0%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+          </div>
+
+          <div class="upload-success" id="uploadSuccess">
+            <h3 id="successTitle">✅ Published!</h3>
+            <p  id="successMsg">The GR2 file is now live on the hub.</p>
+            <div class="success-btns">
+              <button class="btn btn-primary" id="nextBtn" style="display:none">➡ Next File</button>
+              <button class="btn btn-ghost"   id="resetBtn">Upload Another</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metadata -->
+        <div class="card" id="metaCard">
+          <div class="card-title">🏷 Level Metadata</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Level ID *</label>
+              <input type="number" id="metaId" placeholder="128" min="1" />
+            </div>
+            <div class="form-group">
+              <label>Difficulty</label>
+              <select id="metaDiff">
+                <option>Easy</option><option>Normal</option><option>Hard</option>
+                <option>Harder</option><option selected>Insane</option>
+                <option>Easy Demon</option><option>Medium Demon</option>
+                <option>Hard Demon</option><option>Insane Demon</option>
+                <option>Extreme Demon</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
-            <label>Difficulty</label>
-            <select id="meta-diff">
-              <option value="Easy">Easy</option>
-              <option value="Normal">Normal</option>
-              <option value="Hard">Hard</option>
-              <option value="Harder">Harder</option>
-              <option value="Insane" selected>Insane</option>
-              <option value="Easy Demon">Easy Demon</option>
-              <option value="Medium Demon">Medium Demon</option>
-              <option value="Hard Demon">Hard Demon</option>
-              <option value="Insane Demon">Insane Demon</option>
-              <option value="Extreme Demon">Extreme Demon</option>
+            <label>Level Name *</label>
+            <input type="text" id="metaName" placeholder="e.g. Bloodbath" />
+          </div>
+          <div class="form-group">
+            <label>Creator *</label>
+            <input type="text" id="metaCreator" placeholder="e.g. Riot" />
+          </div>
+          <div class="form-group">
+            <label>Section</label>
+            <select id="metaSection">
+              <option value="main">Main Levels</option>
+              <option value="featured">Featured</option>
             </select>
           </div>
+          <button class="btn btn-primary" id="publishBtn" disabled>⬆ Publish to Hub</button>
         </div>
 
-        <div class="form-group">
-          <label>Level Name *</label>
-          <input type="text" id="meta-name" placeholder="e.g. Bloodbath" />
-        </div>
-
-        <div class="form-group">
-          <label>Creator *</label>
-          <input type="text" id="meta-creator" placeholder="e.g. Riot" />
-        </div>
-
-        <div class="form-group">
-          <label>Section</label>
-          <select id="meta-section">
-            <option value="main">Main Levels</option>
-            <option value="featured">Featured</option>
-          </select>
-        </div>
-
-        <button class="btn btn-primary" id="uploadBtn" onclick="doUpload()" disabled>
-          ⬆ Publish to Hub
-        </button>
       </div>
 
-    </div>
+      <!-- RIGHT -->
+      <div style="display:flex;flex-direction:column;gap:16px">
 
-    <!-- RIGHT: Library -->
-    <div style="display:flex;flex-direction:column;gap:16px">
-
-    <!-- JSON Import card -->
-    <div class="card">
-      <div class="card-title">📥 Import JSON</div>
-      <div class="dropzone" id="jsonDropzone" style="padding:24px 20px">
-        <input type="file" id="jsonFileInput" accept=".json,application/json" />
-        <div class="dropzone-icon">📋</div>
-        <div class="dropzone-text">Drag & drop a JSON file here</div>
-        <div class="dropzone-sub">Import a previously exported <span>.json</span> level list</div>
-      </div>
-      <div id="jsonPreview" style="display:none;margin-top:12px">
-        <div style="
-          background:var(--bg3);border:1px solid rgba(26,223,138,0.3);
-          border-radius:8px;padding:12px 14px;
-          display:flex;align-items:center;gap:10px;
-        ">
-          <span style="font-size:1.2rem">📋</span>
-          <div style="flex:1;min-width:0">
-            <div id="jsonPreviewName" style="font-size:0.85rem;font-weight:700;color:var(--success);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-            <div id="jsonPreviewMeta" style="font-size:0.72rem;color:var(--text2);margin-top:2px;font-family:var(--mono)"></div>
+        <!-- JSON import -->
+        <div class="card">
+          <div class="card-title">📥 Import JSON</div>
+          <div class="dropzone" id="jsonZone" style="padding:24px 20px">
+            <input type="file" id="jsonInput" accept=".json,application/json" />
+            <div class="dz-icon">📋</div>
+            <div class="dz-text">Drag &amp; drop a JSON file here</div>
+            <div class="dz-sub">Import a previously exported <span>.json</span> level list</div>
           </div>
-          <button onclick="clearJsonFile()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:1rem;padding:4px;transition:color 0.15s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--dim)'">✕</button>
+          <div id="jsonPreview" style="display:none;margin-top:12px">
+            <div class="json-prev-box">
+              <span style="font-size:1.2rem">📋</span>
+              <div class="jp-info">
+                <div class="jp-name" id="jpName"></div>
+                <div class="jp-meta" id="jpMeta"></div>
+              </div>
+              <button class="jp-rm" id="clearJsonBtn">✕</button>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary" id="importBtn" style="flex:1;padding:10px;font-size:0.82rem">📥 Import to Library</button>
+              <button class="btn btn-ghost"   id="cancelJsonBtn" style="padding:10px 14px;font-size:0.82rem">Cancel</button>
+            </div>
+            <label class="merge-row">
+              <input type="checkbox" id="mergeCheck" checked />
+              Merge with existing (uncheck to replace all)
+            </label>
+          </div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn btn-primary" id="jsonImportBtn" onclick="doImportJSON()" style="flex:1;padding:10px;font-size:0.82rem">
-            📥 Import to Library
-          </button>
-          <button class="btn btn-ghost" onclick="clearJsonFile()" style="padding:10px 14px;font-size:0.82rem">Cancel</button>
+
+        <!-- Library -->
+        <div class="card" style="display:flex;flex-direction:column">
+          <div class="card-title">
+            📚 Published Files
+            <button class="btn btn-danger" id="clearAllBtn" style="margin-left:auto">Clear All</button>
+          </div>
+          <div id="fileList" style="flex:1;overflow-y:auto;max-height:520px">
+            <div class="empty-state" id="emptyState">
+              <div class="empty-icon">📭</div>
+              No files yet.<br>Upload your first GR2 above!
+            </div>
+            <div class="files-list" id="fileListInner"></div>
+          </div>
+          <div class="export-row">
+            <button class="btn btn-ghost" id="exportBtn">⬇ Export JSON</button>
+            <button class="btn btn-ghost" id="copyBtn">📋 Copy JSON</button>
+          </div>
         </div>
-        <div style="margin-top:10px">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.78rem;color:var(--text2)">
-            <input type="checkbox" id="jsonMerge" checked style="accent-color:var(--accent);width:14px;height:14px" />
-            Merge with existing files (uncheck to replace all)
-          </label>
-        </div>
+
       </div>
     </div>
-
-    <!-- Library card -->
-    <div class="card" style="display:flex;flex-direction:column">
-      <div class="card-title">
-        📚 Published Files
-        <button class="btn btn-danger" onclick="clearAll()" style="margin-left:auto" title="Remove all">Clear All</button>
-      </div>
-
-      <div id="fileList" style="flex:1;overflow-y:auto;max-height:560px">
-        <div class="empty-state" id="emptyState">
-          <div class="empty-state-icon">📭</div>
-          No files published yet.<br>Upload your first GR2 above!
-        </div>
-        <div class="files-list" id="filesListInner"></div>
-      </div>
-
-      <div class="export-row">
-        <button class="btn btn-ghost" onclick="exportJSON()" title="Export as JSON you can embed in the website">⬇ Export JSON</button>
-        <button class="btn btn-ghost" onclick="copyJSON()" title="Copy JSON to clipboard">📋 Copy JSON</button>
-      </div>
-    </div>
-
-    </div><!-- /right col -->
-
-  </div><!-- /cols -->
-
-</div><!-- /wrap -->
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
-</div><!-- /wrap -->
-
 <script>
-// ── STORAGE KEY ────────────────────────────────────────────────────────────
-const STORE_KEY = 'eclipse_gr2_files';
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const PASSWORD    = 'eclipse2024'; // change this
+const STORE_KEY   = 'eclipse_gr2_files';
+const SESSION_KEY = 'eclipse_uploader_ok';
 
-// ── LOAD ───────────────────────────────────────────────────────────────────
-let files = [];
-try { files = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch {}
-
-let pendingFile = null; // { name, size, b64, ext }
-
-// ── DRAG & DROP ────────────────────────────────────────────────────────────
-const dz = document.getElementById('dropzone');
-const fi = document.getElementById('fileInput');
-
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('dragover');
-  const f = e.dataTransfer.files[0];
-  if (f) handleFile(f);
-});
-fi.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
-
-// ── JSON DRAG & DROP ────────────────────────────────────────────────────────
-const jdz = document.getElementById('jsonDropzone');
-const jfi = document.getElementById('jsonFileInput');
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let files       = [];
+let fileQueue   = [];
+let queueTotal  = 0;
+let pendingFile = null;
 let pendingJSON = null;
 
-jdz.addEventListener('dragover', e => { e.preventDefault(); jdz.classList.add('dragover'); });
-jdz.addEventListener('dragleave', () => jdz.classList.remove('dragover'));
-jdz.addEventListener('drop', e => {
-  e.preventDefault(); jdz.classList.remove('dragover');
-  const f = e.dataTransfer.files[0];
-  if (f) handleJSONFile(f);
-});
-jfi.addEventListener('change', e => { if (e.target.files[0]) handleJSONFile(e.target.files[0]); });
+try { files = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch {}
 
-function handleJSONFile(f) {
-  if (!f.name.endsWith('.json') && f.type !== 'application/json') {
-    toast('⚠ Please drop a .json file', 'error'); return;
-  }
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const parsed = JSON.parse(ev.target.result);
-      const arr = Array.isArray(parsed) ? parsed : null;
-      if (!arr) { toast('⚠ JSON must be an array of levels', 'error'); return; }
-      pendingJSON = arr;
-      document.getElementById('jsonPreviewName').textContent = f.name;
-      document.getElementById('jsonPreviewMeta').textContent =
-        arr.length + ' level' + (arr.length !== 1 ? 's' : '') + ' found  ·  ' + fmtSize(f.size);
-      document.getElementById('jsonPreview').style.display = 'block';
-      jdz.style.display = 'none';
-    } catch {
-      toast('⚠ Invalid JSON file', 'error');
-    }
-  };
-  reader.readAsText(f);
-}
-
-function clearJsonFile() {
-  pendingJSON = null;
-  document.getElementById('jsonPreview').style.display = 'none';
-  document.getElementById('jsonFileInput').value = '';
-  jdz.style.display = 'block';
-}
-
-function doImportJSON() {
-  if (!pendingJSON) return;
-  const merge = document.getElementById('jsonMerge').checked;
-
-  // Normalise entries — support both uploader format and export format
-  const incoming = pendingJSON.map(e => ({
-    id:          e.id          ?? e.levelId ?? 0,
-    name:        e.name        ?? '—',
-    creator:     e.creator     ?? '—',
-    diff:        e.diff        ?? 'Unknown',
-    section:     e.section     ?? 'main',
-    filename:    e.filename    ?? (e.name ?? 'level') + '.gr2',
-    size:        e.size        ?? 0,
-    ext:         e.ext         ?? 'gr2',
-    b64:         e.b64         ?? (e.gr2?.startsWith('data:') ? e.gr2 : null),
-    uploadedAt:  e.uploadedAt  ?? Date.now()
-  }));
-
-  let added = 0, skipped = 0;
-
-  if (!merge) {
-    // Replace mode
-    files = incoming;
-    added = incoming.length;
+// ── LOCK / UNLOCK ─────────────────────────────────────────────────────────────
+function tryUnlock() {
+  const inp = document.getElementById('lockInput');
+  const err = document.getElementById('lockError');
+  if (inp.value === PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display    = 'block';
+    err.style.display = 'none';
+    bootApp();
   } else {
-    // Merge: skip duplicates by ID
-    incoming.forEach(entry => {
-      if (files.find(f => String(f.id) === String(entry.id))) {
-        skipped++;
-      } else {
-        files.push(entry);
-        added++;
-      }
-    });
+    err.style.display = 'block';
+    inp.classList.add('bad');
+    inp.value = '';
+    setTimeout(() => inp.classList.remove('bad'), 500);
   }
+}
 
-  saveFiles();
+document.getElementById('lockBtn').addEventListener('click', tryUnlock);
+document.getElementById('lockInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryUnlock();
+});
+
+// ── BOOT ─────────────────────────────────────────────────────────────────────
+// All DOM wiring happens here — only called after the app is visible
+function bootApp() {
+  // GR2 drop zone
+  const gr2Zone = document.getElementById('gr2Zone');
+  const gr2Input = document.getElementById('gr2Input');
+  gr2Zone.addEventListener('dragover',  e => { e.preventDefault(); gr2Zone.classList.add('over'); });
+  gr2Zone.addEventListener('dragleave', ()  => gr2Zone.classList.remove('over'));
+  gr2Zone.addEventListener('drop', e => {
+    e.preventDefault(); gr2Zone.classList.remove('over');
+    const all  = [...e.dataTransfer.files];
+    const json = all.filter(f => f.name.endsWith('.json'));
+    const gr2  = all.filter(f => !f.name.endsWith('.json'));
+    if (json.length) handleJSONFile(json[0]);
+    if (gr2.length)  loadQueue(gr2);
+  });
+  gr2Input.addEventListener('change', e => {
+    if (e.target.files.length) loadQueue([...e.target.files]);
+  });
+
+  // JSON drop zone
+  const jsonZone  = document.getElementById('jsonZone');
+  const jsonInput = document.getElementById('jsonInput');
+  jsonZone.addEventListener('dragover',  e => { e.preventDefault(); jsonZone.classList.add('over'); });
+  jsonZone.addEventListener('dragleave', ()  => jsonZone.classList.remove('over'));
+  jsonZone.addEventListener('drop', e => {
+    e.preventDefault(); jsonZone.classList.remove('over');
+    if (e.dataTransfer.files[0]) handleJSONFile(e.dataTransfer.files[0]);
+  });
+  jsonInput.addEventListener('change', e => {
+    if (e.target.files[0]) handleJSONFile(e.target.files[0]);
+  });
+
+  // Buttons
+  document.getElementById('clearFileBtn').addEventListener('click', clearFile);
+  document.getElementById('publishBtn').addEventListener('click', doUpload);
+  document.getElementById('nextBtn').addEventListener('click', loadNext);
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  document.getElementById('clearJsonBtn').addEventListener('click', clearJson);
+  document.getElementById('cancelJsonBtn').addEventListener('click', clearJson);
+  document.getElementById('importBtn').addEventListener('click', doImport);
+  document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+  document.getElementById('exportBtn').addEventListener('click', exportJSON);
+  document.getElementById('copyBtn').addEventListener('click', copyJSON);
+
   renderList();
   updateStats();
-  clearJsonFile();
-
-  const msg = merge
-    ? `✅ Imported ${added} level${added!==1?'s':''}${skipped ? ` · ${skipped} skipped (duplicate ID)` : ''}`
-    : `✅ Replaced library with ${added} level${added!==1?'s':''}`;
-  toast(msg, 'success');
 }
 
-function handleFile(f) {
-  // Show preview
-  document.getElementById('previewName').textContent = f.name;
-  document.getElementById('previewSize').textContent = fmtSize(f.size) + ' — ' + (f.name.split('.').pop().toUpperCase() || 'FILE');
-  document.getElementById('filePreview').classList.add('show');
+// Auto-unlock if session still valid
+if (sessionStorage.getItem(SESSION_KEY)) {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display    = 'block';
+  // Use DOMContentLoaded in case script runs before body finishes
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootApp);
+  } else {
+    bootApp();
+  }
+}
 
-  // Auto-fill name from filename if empty
-  const nameInput = document.getElementById('meta-name');
-  if (!nameInput.value) {
-    let guessed = f.name.replace(/\.[^.]+$/, '').replace(/[_\-]/g, ' ');
-    guessed = guessed.replace(/\b\w/g, c => c.toUpperCase());
-    nameInput.value = guessed;
+// ── FILE QUEUE ────────────────────────────────────────────────────────────────
+function loadQueue(fileList) {
+  fileQueue  = [...fileList];
+  queueTotal = fileQueue.length;
+  clearFormFields();
+  loadNext();
+}
+
+function loadNext() {
+  document.getElementById('uploadSuccess').classList.remove('show');
+  document.getElementById('metaCard').style.display = 'block';
+
+  if (!fileQueue.length) {
+    updateQueueBadge();
+    if (queueTotal > 1) showToast('🎉 All ' + queueTotal + ' files published!', 'success');
+    resetForm();
+    return;
   }
 
-  // Read as base64
+  const f = fileQueue.shift();
+  updateQueueBadge();
+
+  document.getElementById('previewName').textContent = f.name;
+  document.getElementById('previewSize').textContent =
+    fmtSize(f.size) + ' — ' + (f.name.split('.').pop().toUpperCase() || 'FILE');
+  document.getElementById('filePreview').classList.add('show');
+
+  // Auto-fill level name from filename
+  let name = f.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+  name = name.replace(/\b\w/g, c => c.toUpperCase());
+  document.getElementById('metaName').value    = name;
+  document.getElementById('metaId').value      = '';
+  document.getElementById('metaCreator').value = '';
+
   const reader = new FileReader();
   reader.onload = ev => {
     pendingFile = {
-      name: f.name,
-      size: f.size,
-      ext: (f.name.split('.').pop() || 'gr2').toLowerCase(),
-      b64: ev.target.result // data URL
+      name: f.name, size: f.size,
+      ext:  (f.name.split('.').pop() || 'gr2').toLowerCase(),
+      b64:  ev.target.result
     };
-    document.getElementById('uploadBtn').disabled = false;
+    document.getElementById('publishBtn').disabled = false;
   };
   reader.readAsDataURL(f);
 }
 
-function clearFile() {
-  pendingFile = null;
-  document.getElementById('filePreview').classList.remove('show');
-  document.getElementById('fileInput').value = '';
-  document.getElementById('uploadBtn').disabled = true;
+function updateQueueBadge() {
+  const badge = document.getElementById('queueBadge');
+  const done  = queueTotal - fileQueue.length;
+  if (queueTotal > 1) {
+    badge.style.display = 'inline-block';
+    badge.textContent   = done + ' / ' + queueTotal;
+  } else {
+    badge.style.display = 'none';
+  }
 }
 
-// ── UPLOAD ─────────────────────────────────────────────────────────────────
+function clearFile() {
+  pendingFile = null;
+  fileQueue   = [];
+  queueTotal  = 0;
+  document.getElementById('filePreview').classList.remove('show');
+  document.getElementById('gr2Input').value = '';
+  document.getElementById('publishBtn').disabled = true;
+  updateQueueBadge();
+}
+
+function clearFormFields() {
+  document.getElementById('metaId').value      = '';
+  document.getElementById('metaName').value    = '';
+  document.getElementById('metaCreator').value = '';
+  document.getElementById('metaDiff').value    = 'Insane';
+  document.getElementById('metaSection').value = 'main';
+  document.getElementById('progressWrap').classList.remove('show');
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('publishBtn').disabled = true;
+}
+
+function resetForm() {
+  pendingFile = null;
+  fileQueue   = [];
+  queueTotal  = 0;
+  clearFormFields();
+  document.getElementById('gr2Input').value = '';
+  document.getElementById('filePreview').classList.remove('show');
+  document.getElementById('uploadSuccess').classList.remove('show');
+  document.getElementById('metaCard').style.display = 'block';
+  document.getElementById('nextBtn').style.display  = 'none';
+  updateQueueBadge();
+}
+
+// ── UPLOAD ────────────────────────────────────────────────────────────────────
 function doUpload() {
-  const id      = document.getElementById('meta-id').value.trim();
-  const name    = document.getElementById('meta-name').value.trim();
-  const creator = document.getElementById('meta-creator').value.trim();
-  const diff    = document.getElementById('meta-diff').value;
-  const section = document.getElementById('meta-section').value;
+  const id      = document.getElementById('metaId').value.trim();
+  const name    = document.getElementById('metaName').value.trim();
+  const creator = document.getElementById('metaCreator').value.trim();
+  const diff    = document.getElementById('metaDiff').value;
+  const section = document.getElementById('metaSection').value;
 
-  if (!pendingFile) { toast('Drop a file first!', 'error'); return; }
-  if (!id || isNaN(id) || !name || !creator) { toast('Fill in all required fields', 'error'); return; }
-  if (files.find(f => String(f.id) === String(id))) {
-    toast('A file with ID ' + id + ' already exists!', 'error'); return;
-  }
+  if (!pendingFile)                 { showToast('Drop a file first!', 'error'); return; }
+  if (!id || isNaN(id) || +id < 1)  { showToast('Enter a valid Level ID', 'error'); return; }
+  if (!name)                        { showToast('Enter the level name', 'error'); return; }
+  if (!creator)                     { showToast('Enter the creator name', 'error'); return; }
+  if (files.find(f => String(f.id) === id)) { showToast('ID ' + id + ' already exists!', 'error'); return; }
 
-  // Animate progress
-  const pw = document.getElementById('progressWrap');
-  const pb = document.getElementById('progressBar');
-  const pl = document.getElementById('progressLabel');
-  const pp = document.getElementById('progressPct');
+  const pw  = document.getElementById('progressWrap');
+  const pb  = document.getElementById('progressBar');
+  const pl  = document.getElementById('progressLabel');
+  const pp  = document.getElementById('progressPct');
   pw.classList.add('show');
-  document.getElementById('uploadBtn').disabled = true;
+  document.getElementById('publishBtn').disabled = true;
 
-  let pct = 0;
+  let pct = 0, si = 0;
   const stages = ['Reading file...', 'Encoding...', 'Saving to hub...', 'Finalising...'];
-  let si = 0;
   const iv = setInterval(() => {
     pct += Math.random() * 18 + 8;
     if (pct > 100) pct = 100;
     pb.style.width = pct + '%';
     pp.textContent = Math.floor(pct) + '%';
-    if (si < stages.length - 1 && pct > (si + 1) * 25) { pl.textContent = stages[++si]; }
+    if (si < stages.length - 1 && pct > (si + 1) * 25) pl.textContent = stages[++si];
     if (pct >= 100) {
       clearInterval(iv);
       pl.textContent = 'Done!';
       setTimeout(() => {
         // Save entry
-        const entry = {
-          id: parseInt(id),
-          name, creator, diff, section,
-          filename: pendingFile.name,
-          size: pendingFile.size,
-          ext: pendingFile.ext,
-          b64: pendingFile.b64,
+        files.push({
+          id: parseInt(id), name, creator, diff, section,
+          filename: pendingFile.name, size: pendingFile.size,
+          ext: pendingFile.ext, b64: pendingFile.b64,
           uploadedAt: Date.now()
-        };
-        files.push(entry);
-        saveFiles();
+        });
+        saveFiles(); renderList(); updateStats();
 
-        // Show success
+        // Reset progress
         pw.classList.remove('show');
+        pb.style.width = '0%';
         document.getElementById('metaCard').style.display = 'none';
         document.getElementById('filePreview').classList.remove('show');
-        const sm = document.getElementById('uploadSuccess');
-        sm.classList.add('show');
-        document.getElementById('uploadSuccessMsg').textContent = '"' + name + '" is now live on the hub.';
 
-        renderList();
-        updateStats();
-        toast('✅ ' + name + ' published!', 'success');
+        // Show success with queue info
+        const rem = fileQueue.length;
+        const nb  = document.getElementById('nextBtn');
+        document.getElementById('successTitle').textContent =
+          rem > 0 ? '✅ Published! (' + (queueTotal - rem) + '/' + queueTotal + ')' : (queueTotal > 1 ? '🎉 All Done!' : '✅ Published!');
+        document.getElementById('successMsg').textContent =
+          rem > 0 ? '"' + name + '" is live. ' + rem + ' file' + (rem !== 1 ? 's' : '') + ' left.' : '"' + name + '" is now live on the hub.';
+        nb.style.display = rem > 0 ? 'inline-block' : 'none';
+        if (rem > 0) nb.textContent = '➡ Next File (' + rem + ' left)';
+        document.getElementById('uploadSuccess').classList.add('show');
+        showToast('✅ ' + name + ' published!', 'success');
       }, 300);
     }
   }, 80);
 }
 
-function resetForm() {
-  pendingFile = null;
-  document.getElementById('meta-id').value = '';
-  document.getElementById('meta-name').value = '';
-  document.getElementById('meta-creator').value = '';
-  document.getElementById('meta-diff').value = 'Insane';
-  document.getElementById('meta-section').value = 'main';
-  document.getElementById('fileInput').value = '';
-  document.getElementById('filePreview').classList.remove('show');
-  document.getElementById('progressWrap').classList.remove('show');
-  document.getElementById('uploadSuccess').classList.remove('show');
-  document.getElementById('metaCard').style.display = 'block';
-  document.getElementById('progressBar').style.width = '0%';
-  document.getElementById('uploadBtn').disabled = true;
+// ── JSON IMPORT ───────────────────────────────────────────────────────────────
+function handleJSONFile(f) {
+  if (!f.name.endsWith('.json') && f.type !== 'application/json') {
+    showToast('⚠ Please drop a .json file', 'error'); return;
+  }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const arr = JSON.parse(ev.target.result);
+      if (!Array.isArray(arr)) { showToast('⚠ JSON must be an array', 'error'); return; }
+      pendingJSON = arr;
+      document.getElementById('jpName').textContent = f.name;
+      document.getElementById('jpMeta').textContent = arr.length + ' level' + (arr.length !== 1 ? 's' : '') + ' · ' + fmtSize(f.size);
+      document.getElementById('jsonPreview').style.display = 'block';
+      document.getElementById('jsonZone').style.display    = 'none';
+    } catch { showToast('⚠ Invalid JSON file', 'error'); }
+  };
+  reader.readAsText(f);
 }
 
-// ── RENDER LIST ────────────────────────────────────────────────────────────
+function clearJson() {
+  pendingJSON = null;
+  document.getElementById('jsonPreview').style.display = 'none';
+  document.getElementById('jsonZone').style.display    = 'block';
+  document.getElementById('jsonInput').value = '';
+}
+
+function doImport() {
+  if (!pendingJSON) return;
+  const merge = document.getElementById('mergeCheck').checked;
+  const inc = pendingJSON.map(e => ({
+    id: e.id ?? e.levelId ?? 0, name: e.name ?? '—', creator: e.creator ?? '—',
+    diff: e.diff ?? 'Unknown', section: e.section ?? 'main',
+    filename: e.filename ?? (e.name ?? 'level') + '.gr2',
+    size: e.size ?? 0, ext: e.ext ?? 'gr2',
+    b64: e.b64 ?? (e.gr2?.startsWith('data:') ? e.gr2 : null),
+    uploadedAt: e.uploadedAt ?? Date.now()
+  }));
+  let added = 0, skipped = 0;
+  if (!merge) { files = inc; added = inc.length; }
+  else inc.forEach(e => {
+    if (files.find(f => String(f.id) === String(e.id))) skipped++;
+    else { files.push(e); added++; }
+  });
+  saveFiles(); renderList(); updateStats(); clearJson();
+  showToast('✅ Imported ' + added + (skipped ? ' · ' + skipped + ' skipped' : ''), 'success');
+}
+
+// ── LIBRARY ───────────────────────────────────────────────────────────────────
 function renderList() {
-  const inner = document.getElementById('filesListInner');
+  const inner = document.getElementById('fileListInner');
   const empty = document.getElementById('emptyState');
-
-  if (!files.length) {
-    inner.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  if (!files.length) { inner.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-
   inner.innerHTML = [...files].reverse().map((f, ri) => {
     const i = files.length - 1 - ri;
-    const ago = timeAgo(f.uploadedAt);
-    return `
-      <div class="file-entry" id="entry-${i}">
-        <div class="file-entry-top">
-          <span class="file-entry-num">#${f.id}</span>
-          <span class="file-entry-name">${f.name}</span>
-        </div>
-        <div class="file-entry-meta">
-          <span class="chip">${f.creator}</span>
-          <span class="chip chip-diff">${f.diff}</span>
-          <span class="chip chip-type">.${f.ext}</span>
-          <span class="chip chip-size">${fmtSize(f.size)}</span>
-          <span class="chip">${ago}</span>
-        </div>
-        <div class="file-entry-actions">
-          <button class="file-entry-dl" onclick="downloadEntry(${i})">⬇ Download</button>
-          <button class="btn btn-danger" onclick="deleteEntry(${i})">🗑 Remove</button>
-        </div>
+    return `<div class="file-entry">
+      <div class="fe-top">
+        <span class="fe-num">#${f.id}</span>
+        <span class="fe-name">${esc(f.name)}</span>
       </div>
-    `;
+      <div class="fe-meta">
+        <span class="chip">${esc(f.creator)}</span>
+        <span class="chip chip-diff">${esc(f.diff)}</span>
+        <span class="chip chip-type">.${f.ext}</span>
+        <span class="chip">${fmtSize(f.size)}</span>
+        <span class="chip">${timeAgo(f.uploadedAt)}</span>
+      </div>
+      <div class="fe-actions">
+        <button class="fe-dl" onclick="dlEntry(${i})">⬇ Download</button>
+        <button class="btn btn-danger" onclick="delEntry(${i})">🗑 Remove</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
-function downloadEntry(i) {
+function dlEntry(i) {
   const f = files[i];
-  if (!f || !f.b64) { toast('No file data stored', 'error'); return; }
+  if (!f?.b64) { showToast('No file data stored', 'error'); return; }
   const a = document.createElement('a');
-  a.href = f.b64;
-  a.download = f.filename || f.name + '.' + f.ext;
-  a.click();
-  toast('⬇ Downloading ' + f.name, 'success');
+  a.href = f.b64; a.download = f.filename || f.name + '.' + f.ext; a.click();
+  showToast('⬇ Downloading ' + f.name, 'success');
 }
 
-function deleteEntry(i) {
+function delEntry(i) {
   const name = files[i]?.name;
-  files.splice(i, 1);
-  saveFiles();
-  renderList();
-  updateStats();
-  toast('🗑 Removed ' + name, '');
+  files.splice(i, 1); saveFiles(); renderList(); updateStats();
+  showToast('🗑 Removed ' + name, '');
 }
 
 function clearAll() {
-  if (!files.length) { toast('Nothing to clear', ''); return; }
-  if (!confirm('Remove ALL ' + files.length + ' file(s) from the hub?')) return;
-  files = [];
-  saveFiles();
-  renderList();
-  updateStats();
-  toast('🗑 All files cleared', '');
+  if (!files.length) { showToast('Nothing to clear', ''); return; }
+  if (!confirm('Remove ALL ' + files.length + ' file(s)?')) return;
+  files = []; saveFiles(); renderList(); updateStats();
+  showToast('🗑 Library cleared', '');
 }
 
-// ── EXPORT ─────────────────────────────────────────────────────────────────
-function getExportData() {
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function getExport() {
   return files.map(f => ({
-    id: f.id,
-    name: f.name,
-    creator: f.creator,
-    diff: f.diff,
-    section: f.section,
-    filename: f.filename,
-    size: f.size,
-    ext: f.ext,
-    gr2: f.b64 ? 'data:embedded' : '#',
-    uploadedAt: f.uploadedAt
+    id:f.id, name:f.name, creator:f.creator, diff:f.diff, section:f.section,
+    filename:f.filename, size:f.size, ext:f.ext, b64:f.b64, uploadedAt:f.uploadedAt
   }));
 }
-
 function exportJSON() {
-  const data = JSON.stringify(getExportData(), null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'eclipse-gr2-levels.json';
-  a.click();
-  toast('⬇ JSON exported', 'success');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(getExport(), null, 2)], { type:'application/json' }));
+  a.download = 'eclipse-gr2-levels.json'; a.click();
+  showToast('⬇ JSON exported', 'success');
 }
-
 function copyJSON() {
-  const data = JSON.stringify(getExportData(), null, 2);
-  navigator.clipboard.writeText(data).then(() => toast('📋 JSON copied!', 'success')).catch(() => toast('Copy failed', 'error'));
+  navigator.clipboard.writeText(JSON.stringify(getExport(), null, 2))
+    .then(() => showToast('📋 Copied!', 'success'))
+    .catch(() => showToast('Copy failed', 'error'));
 }
 
-// ── STATS ──────────────────────────────────────────────────────────────────
+// ── STATS / HELPERS ───────────────────────────────────────────────────────────
 function updateStats() {
-  document.getElementById('stat-total').textContent = files.length;
-  const total = files.reduce((s, f) => s + (f.size || 0), 0);
-  document.getElementById('stat-size').textContent = fmtSize(total);
+  document.getElementById('statTotal').textContent = files.length;
+  document.getElementById('statSize').textContent  = fmtSize(files.reduce((s,f) => s+(f.size||0), 0));
   const today = new Date(); today.setHours(0,0,0,0);
-  const tc = files.filter(f => f.uploadedAt >= today.getTime()).length;
-  document.getElementById('stat-today').textContent = tc;
+  document.getElementById('statToday').textContent = files.filter(f => f.uploadedAt >= today.getTime()).length;
 }
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
 function saveFiles() { localStorage.setItem(STORE_KEY, JSON.stringify(files)); }
 
-function fmtSize(bytes) {
-  if (!bytes) return '0 B';
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-  return (bytes/1024/1024).toFixed(2) + ' MB';
+function fmtSize(b) {
+  if (!b) return '0 B';
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(2) + ' MB';
 }
 
 function timeAgo(ts) {
-  const diff = Date.now() - ts;
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'just now';
+  const m = Math.floor((Date.now()-ts)/60000);
+  if (m < 1)  return 'just now';
   if (m < 60) return m + 'm ago';
-  const h = Math.floor(m / 60);
+  const h = Math.floor(m/60);
   if (h < 24) return h + 'h ago';
-  return Math.floor(h / 24) + 'd ago';
+  return Math.floor(h/24) + 'd ago';
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 let toastTimer;
-function toast(msg, type) {
+function showToast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show' + (type ? ' ' + type : '');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// ── LOCK / UNLOCK ──────────────────────────────────────────────────────────
-// 🔑 Change this password to whatever you want
-const UPLOADER_PASSWORD = 'eclipse2024';
-const SESSION_KEY = 'eclipse_uploader_unlocked';
-
-function tryUnlock() {
-  const val = document.getElementById('lockInput').value;
-  const err = document.getElementById('lockError');
-  const inp = document.getElementById('lockInput');
-
-  if (val === UPLOADER_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, '1');
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    err.style.display = 'none';
-    renderList();
-    updateStats();
-  } else {
-    err.style.display = 'block';
-    inp.style.borderColor = 'var(--red)';
-    inp.style.animation = 'none';
-    inp.value = '';
-    setTimeout(() => { inp.style.borderColor = ''; }, 800);
-  }
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-if (sessionStorage.getItem(SESSION_KEY)) {
-  document.getElementById('lockScreen').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-  renderList();
-  updateStats();
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
-</div><!-- /mainApp -->
 </body>
 </html>
