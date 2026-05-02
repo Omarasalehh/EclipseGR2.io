@@ -498,6 +498,46 @@
     </div>
 
     <!-- RIGHT: Library -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+    <!-- JSON Import card -->
+    <div class="card">
+      <div class="card-title">📥 Import JSON</div>
+      <div class="dropzone" id="jsonDropzone" style="padding:24px 20px">
+        <input type="file" id="jsonFileInput" accept=".json,application/json" />
+        <div class="dropzone-icon">📋</div>
+        <div class="dropzone-text">Drag & drop a JSON file here</div>
+        <div class="dropzone-sub">Import a previously exported <span>.json</span> level list</div>
+      </div>
+      <div id="jsonPreview" style="display:none;margin-top:12px">
+        <div style="
+          background:var(--bg3);border:1px solid rgba(26,223,138,0.3);
+          border-radius:8px;padding:12px 14px;
+          display:flex;align-items:center;gap:10px;
+        ">
+          <span style="font-size:1.2rem">📋</span>
+          <div style="flex:1;min-width:0">
+            <div id="jsonPreviewName" style="font-size:0.85rem;font-weight:700;color:var(--success);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div id="jsonPreviewMeta" style="font-size:0.72rem;color:var(--text2);margin-top:2px;font-family:var(--mono)"></div>
+          </div>
+          <button onclick="clearJsonFile()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:1rem;padding:4px;transition:color 0.15s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--dim)'">✕</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-primary" id="jsonImportBtn" onclick="doImportJSON()" style="flex:1;padding:10px;font-size:0.82rem">
+            📥 Import to Library
+          </button>
+          <button class="btn btn-ghost" onclick="clearJsonFile()" style="padding:10px 14px;font-size:0.82rem">Cancel</button>
+        </div>
+        <div style="margin-top:10px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.78rem;color:var(--text2)">
+            <input type="checkbox" id="jsonMerge" checked style="accent-color:var(--accent);width:14px;height:14px" />
+            Merge with existing files (uncheck to replace all)
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Library card -->
     <div class="card" style="display:flex;flex-direction:column">
       <div class="card-title">
         📚 Published Files
@@ -517,6 +557,8 @@
         <button class="btn btn-ghost" onclick="copyJSON()" title="Copy JSON to clipboard">📋 Copy JSON</button>
       </div>
     </div>
+
+    </div><!-- /right col -->
 
   </div><!-- /cols -->
 
@@ -548,6 +590,97 @@ dz.addEventListener('drop', e => {
   if (f) handleFile(f);
 });
 fi.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+// ── JSON DRAG & DROP ────────────────────────────────────────────────────────
+const jdz = document.getElementById('jsonDropzone');
+const jfi = document.getElementById('jsonFileInput');
+let pendingJSON = null;
+
+jdz.addEventListener('dragover', e => { e.preventDefault(); jdz.classList.add('dragover'); });
+jdz.addEventListener('dragleave', () => jdz.classList.remove('dragover'));
+jdz.addEventListener('drop', e => {
+  e.preventDefault(); jdz.classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if (f) handleJSONFile(f);
+});
+jfi.addEventListener('change', e => { if (e.target.files[0]) handleJSONFile(e.target.files[0]); });
+
+function handleJSONFile(f) {
+  if (!f.name.endsWith('.json') && f.type !== 'application/json') {
+    toast('⚠ Please drop a .json file', 'error'); return;
+  }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      const arr = Array.isArray(parsed) ? parsed : null;
+      if (!arr) { toast('⚠ JSON must be an array of levels', 'error'); return; }
+      pendingJSON = arr;
+      document.getElementById('jsonPreviewName').textContent = f.name;
+      document.getElementById('jsonPreviewMeta').textContent =
+        arr.length + ' level' + (arr.length !== 1 ? 's' : '') + ' found  ·  ' + fmtSize(f.size);
+      document.getElementById('jsonPreview').style.display = 'block';
+      jdz.style.display = 'none';
+    } catch {
+      toast('⚠ Invalid JSON file', 'error');
+    }
+  };
+  reader.readAsText(f);
+}
+
+function clearJsonFile() {
+  pendingJSON = null;
+  document.getElementById('jsonPreview').style.display = 'none';
+  document.getElementById('jsonFileInput').value = '';
+  jdz.style.display = 'block';
+}
+
+function doImportJSON() {
+  if (!pendingJSON) return;
+  const merge = document.getElementById('jsonMerge').checked;
+
+  // Normalise entries — support both uploader format and export format
+  const incoming = pendingJSON.map(e => ({
+    id:          e.id          ?? e.levelId ?? 0,
+    name:        e.name        ?? '—',
+    creator:     e.creator     ?? '—',
+    diff:        e.diff        ?? 'Unknown',
+    section:     e.section     ?? 'main',
+    filename:    e.filename    ?? (e.name ?? 'level') + '.gr2',
+    size:        e.size        ?? 0,
+    ext:         e.ext         ?? 'gr2',
+    b64:         e.b64         ?? (e.gr2?.startsWith('data:') ? e.gr2 : null),
+    uploadedAt:  e.uploadedAt  ?? Date.now()
+  }));
+
+  let added = 0, skipped = 0;
+
+  if (!merge) {
+    // Replace mode
+    files = incoming;
+    added = incoming.length;
+  } else {
+    // Merge: skip duplicates by ID
+    incoming.forEach(entry => {
+      if (files.find(f => String(f.id) === String(entry.id))) {
+        skipped++;
+      } else {
+        files.push(entry);
+        added++;
+      }
+    });
+  }
+
+  saveFiles();
+  renderList();
+  updateStats();
+  clearJsonFile();
+
+  const msg = merge
+    ? `✅ Imported ${added} level${added!==1?'s':''}${skipped ? ` · ${skipped} skipped (duplicate ID)` : ''}`
+    : `✅ Replaced library with ${added} level${added!==1?'s':''}`;
+  toast(msg, 'success');
+}
 
 function handleFile(f) {
   // Show preview
